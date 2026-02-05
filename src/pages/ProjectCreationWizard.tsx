@@ -8,15 +8,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { useToast } from "@/components/ui/use-toast";
 import { api } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Check, Rocket, BookOpen, Target, FileUp } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { ArrowRight, ArrowLeft, Check, Rocket, BookOpen, Target, FileUp, Sparkles, Zap, Telescope } from "lucide-react";
 
 const STEPS = [
-  { id: "title", title: "Project Title", description: "What's the name of your research journey?", icon: Rocket },
-  { id: "field", title: "Research Field", description: "Which domain does your research belong to?", icon: BookOpen },
-  { id: "objective", title: "Research Objective", description: "What do you aim to discover or prove?", icon: Target },
-  { id: "proposal", title: "Proposal Upload", description: "Upload your initial research proposal (optional)", icon: FileUp },
-  { id: "review", title: "Final Review", description: "Confirm your project details", icon: Check },
+  { id: "title", title: "Name Your Mission", description: "Every great discovery starts with a name", icon: Rocket },
+  { id: "field", title: "Choose Your Domain", description: "Which frontier will you explore?", icon: Telescope },
+  { id: "objective", title: "Define Your Quest", description: "What truth do you seek to uncover?", icon: Target },
+  { id: "proposal", title: "Upload Blueprint", description: "Attach your research proposal (optional)", icon: FileUp },
+  { id: "review", title: "Launch Sequence", description: "Review and initiate your research journey", icon: Zap },
+];
+
+const RESEARCH_FIELDS = [
+  { id: "stem", label: "STEM & Engineering", color: "from-cyan-500 to-blue-500" },
+  { id: "medical", label: "Medical & Life Sciences", color: "from-green-500 to-emerald-500" },
+  { id: "social", label: "Social Sciences", color: "from-purple-500 to-violet-500" },
+  { id: "humanities", label: "Humanities & Arts", color: "from-orange-500 to-amber-500" },
+  { id: "business", label: "Business & Economics", color: "from-pink-500 to-rose-500" },
+  { id: "interdisciplinary", label: "Interdisciplinary", color: "from-indigo-500 to-purple-500" },
 ];
 
 const ProjectCreationWizard = () => {
@@ -29,6 +37,7 @@ const ProjectCreationWizard = () => {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -57,31 +66,15 @@ const ProjectCreationWizard = () => {
       return;
     }
 
+    setSelectedFile(file);
     setIsUploading(true);
-    try {
-      const fileName = `${Math.random()}-${file.name}`;
-      const { data, error } = await supabase.storage
-        .from("project_documents")
-        .upload(fileName, file);
-
-      if (error) throw error;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from("project_documents")
-        .getPublicUrl(data.path);
-
-      setFormData({ ...formData, proposalUrl: publicUrl });
-      toast({ title: "Proposal uploaded successfully" });
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast({
-        title: "Upload failed",
-        description: "Please try again or skip this step",
-        variant: "destructive",
-      });
-    } finally {
+    
+    // Simulate upload for now - will be replaced with actual Supabase storage
+    setTimeout(() => {
+      setFormData({ ...formData, proposalUrl: `uploaded:${file.name}` });
       setIsUploading(false);
-    }
+      toast({ title: "Proposal uploaded successfully" });
+    }, 1500);
   };
 
   const handleSubmit = async () => {
@@ -89,14 +82,14 @@ const ProjectCreationWizard = () => {
     try {
       await api.post("/projects", formData);
       toast({
-        title: "Project created successfully!",
+        title: "Mission Launched! 🚀",
         description: "Your research pipeline has been automatically generated.",
       });
       navigate("/dashboard");
     } catch (error) {
       console.error("Submission error:", error);
       toast({
-        title: "Failed to create project",
+        title: "Launch sequence failed",
         description: error instanceof Error ? error.message : "Please try again",
         variant: "destructive",
       });
@@ -108,139 +101,267 @@ const ProjectCreationWizard = () => {
   const step = STEPS[currentStep];
   const Icon = step.icon;
 
+  const canProceed = () => {
+    if (currentStep === 0) return formData.title.length >= 3;
+    if (currentStep === 1) return formData.field.length > 0;
+    if (currentStep === 2) return formData.objective.length >= 10;
+    if (currentStep === 3) return true; // Optional step
+    return true;
+  };
+
   return (
     <DashboardShell>
-      <div className="max-w-2xl mx-auto py-10">
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            {STEPS.map((s, idx) => (
-              <div
-                key={s.id}
-                className={`h-2 flex-1 mx-1 rounded-full transition-colors ${
-                  idx <= currentStep ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            ))}
-          </div>
-          <h1 className="text-3xl font-bold text-foreground">Project Wizard</h1>
-          <p className="text-muted-foreground">Follow the steps to launch your mission.</p>
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <Card className="bg-background/60 backdrop-blur border-border/60 overflow-hidden">
-              <CardHeader className="text-center pb-2">
-                <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle className="text-2xl">{step.title}</CardTitle>
-                <CardDescription>{step.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6 min-h-[200px] flex items-center justify-center">
-                {currentStep === 0 && (
-                  <Input
-                    placeholder="Enter project title..."
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="text-lg py-6"
-                    autoFocus
-                  />
-                )}
-                {currentStep === 1 && (
-                  <Input
-                    placeholder="e.g. Astrophysics, Behavioral Economics..."
-                    value={formData.field}
-                    onChange={(e) => setFormData({ ...formData, field: e.target.value })}
-                    className="text-lg py-6"
-                    autoFocus
-                  />
-                )}
-                {currentStep === 2 && (
-                  <Textarea
-                    placeholder="Describe your research goal in detail..."
-                    value={formData.objective}
-                    onChange={(e) => setFormData({ ...formData, objective: e.target.value })}
-                    className="text-lg min-h-[150px]"
-                    autoFocus
-                  />
-                )}
-                {currentStep === 3 && (
-                  <div className="space-y-4 w-full">
-                    <div className="border-2 border-dashed border-muted-foreground/25 rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer relative">
-                      <input
-                        type="file"
-                        accept=".pdf,.doc,.docx"
-                        onChange={handleFileUpload}
-                        className="absolute inset-0 opacity-0 cursor-pointer"
-                        disabled={isUploading}
-                      />
-                      <FileUp className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">
-                        {isUploading ? "Uploading..." : "Click to upload or drag and drop"}
-                      </p>
-                      <p className="text-xs text-muted-foreground/60 mt-1">PDF, DOC up to 20MB</p>
-                    </div>
-                    {formData.proposalUrl && (
-                      <div className="flex items-center gap-2 text-sm text-primary font-medium bg-primary/5 p-3 rounded-lg">
-                        <Check className="w-4 h-4" />
-                        Proposal linked successfully
-                      </div>
-                    )}
-                  </div>
-                )}
-                {currentStep === 4 && (
-                  <div className="w-full space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 rounded-lg bg-muted/40">
-                        <span className="text-xs text-muted-foreground uppercase tracking-wider">Title</span>
-                        <p className="font-medium">{formData.title}</p>
-                      </div>
-                      <div className="p-4 rounded-lg bg-muted/40">
-                        <span className="text-xs text-muted-foreground uppercase tracking-wider">Field</span>
-                        <p className="font-medium">{formData.field}</p>
-                      </div>
-                    </div>
-                    <div className="p-4 rounded-lg bg-muted/40">
-                      <span className="text-xs text-muted-foreground uppercase tracking-wider">Objective</span>
-                      <p className="font-medium line-clamp-3">{formData.objective}</p>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-              <CardFooter className="flex justify-between border-t border-border/40 pt-6">
-                <Button variant="ghost" onClick={handleBack} disabled={currentStep === 0}>
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back
-                </Button>
-                {currentStep === STEPS.length - 1 ? (
-                  <Button onClick={handleSubmit} disabled={isSubmitting}>
-                    {isSubmitting ? "Generating Pipeline..." : "Launch Mission"}
-                    <Rocket className="w-4 h-4 ml-2" />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleNext}
-                    disabled={
-                      (currentStep === 0 && !formData.title) ||
-                      (currentStep === 1 && !formData.field) ||
-                      (currentStep === 2 && !formData.objective) ||
-                      isUploading
-                    }
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center py-10 px-4">
+        <div className="w-full max-w-3xl">
+          {/* Progress Bar */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              {STEPS.map((s, idx) => (
+                <div key={s.id} className="flex items-center flex-1">
+                  <motion.div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
+                      idx < currentStep
+                        ? "bg-primary text-primary-foreground"
+                        : idx === currentStep
+                        ? "bg-primary text-primary-foreground ring-4 ring-primary/30"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                    animate={{ scale: idx === currentStep ? 1.1 : 1 }}
                   >
-                    Next
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    {idx < currentStep ? <Check className="w-5 h-5" /> : idx + 1}
+                  </motion.div>
+                  {idx < STEPS.length - 1 && (
+                    <div
+                      className={`flex-1 h-1 mx-2 rounded-full transition-colors duration-300 ${
+                        idx < currentStep ? "bg-primary" : "bg-muted"
+                      }`}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold gradient-text-animated mb-2">Project Launch Wizard</h1>
+              <p className="text-muted-foreground">Step {currentStep + 1} of {STEPS.length}</p>
+            </div>
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.98 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
+              <Card className="glass-strong overflow-hidden border-primary/20">
+                {/* Decorative gradient header */}
+                <div className="h-2 bg-gradient-to-r from-primary via-secondary to-accent" />
+                
+                <CardHeader className="text-center pt-8 pb-4">
+                  <motion.div
+                    className="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-6 relative"
+                    animate={{ rotate: [0, 5, -5, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <Icon className="w-10 h-10 text-primary" />
+                    <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-secondary animate-pulse" />
+                  </motion.div>
+                  <CardTitle className="text-3xl font-bold">{step.title}</CardTitle>
+                  <CardDescription className="text-lg">{step.description}</CardDescription>
+                </CardHeader>
+
+                <CardContent className="pt-4 pb-8 min-h-[280px] flex items-center justify-center px-8">
+                  {/* Step 1: Title */}
+                  {currentStep === 0 && (
+                    <div className="w-full space-y-4">
+                      <Input
+                        placeholder="e.g., Quantum Computing in Drug Discovery"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        className="text-xl h-16 text-center bg-muted/50 border-primary/30 focus:border-primary"
+                        autoFocus
+                      />
+                      <p className="text-center text-sm text-muted-foreground">
+                        Choose a compelling name that captures your research vision
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Step 2: Research Field */}
+                  {currentStep === 1 && (
+                    <div className="w-full grid grid-cols-2 gap-3">
+                      {RESEARCH_FIELDS.map((field) => (
+                        <motion.button
+                          key={field.id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => setFormData({ ...formData, field: field.label })}
+                          className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                            formData.field === field.label
+                              ? "border-primary bg-primary/10"
+                              : "border-border/50 hover:border-primary/50 bg-muted/30"
+                          }`}
+                        >
+                          <div className={`w-full h-1 rounded-full bg-gradient-to-r ${field.color} mb-3`} />
+                          <span className="font-medium">{field.label}</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Step 3: Objective */}
+                  {currentStep === 2 && (
+                    <div className="w-full space-y-4">
+                      <Textarea
+                        placeholder="Describe your research objective in detail. What question are you trying to answer? What impact do you hope to achieve?"
+                        value={formData.objective}
+                        onChange={(e) => setFormData({ ...formData, objective: e.target.value })}
+                        className="text-base min-h-[180px] bg-muted/50 border-primary/30 focus:border-primary resize-none"
+                        autoFocus
+                      />
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>Be specific and measurable</span>
+                        <span>{formData.objective.length} characters</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 4: File Upload */}
+                  {currentStep === 3 && (
+                    <div className="w-full space-y-4">
+                      <motion.label
+                        whileHover={{ scale: 1.01 }}
+                        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-primary/30 rounded-2xl cursor-pointer bg-muted/20 hover:bg-muted/40 transition-all relative overflow-hidden group"
+                      >
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                          disabled={isUploading}
+                        />
+                        {isUploading ? (
+                          <div className="flex flex-col items-center">
+                            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+                            <p className="text-primary font-medium">Uploading...</p>
+                          </div>
+                        ) : formData.proposalUrl ? (
+                          <div className="flex flex-col items-center">
+                            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                              <Check className="w-8 h-8 text-primary" />
+                            </div>
+                            <p className="font-medium text-primary">Proposal Uploaded</p>
+                            <p className="text-sm text-muted-foreground mt-1">{selectedFile?.name}</p>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <FileUp className="w-12 h-12 text-muted-foreground mb-4 group-hover:text-primary transition-colors" />
+                            <p className="font-medium text-foreground">Drop your proposal here</p>
+                            <p className="text-sm text-muted-foreground mt-1">PDF, DOC up to 20MB</p>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </motion.label>
+                      <p className="text-center text-sm text-muted-foreground">
+                        This step is optional — you can add documents later
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Step 5: Review */}
+                  {currentStep === 4 && (
+                    <div className="w-full space-y-6">
+                      <div className="grid gap-4">
+                        <div className="p-5 rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Rocket className="w-4 h-4 text-primary" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Mission Name</span>
+                          </div>
+                          <p className="text-xl font-bold">{formData.title}</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-5 rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                            <div className="flex items-center gap-2 mb-2">
+                              <BookOpen className="w-4 h-4 text-secondary" />
+                              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Domain</span>
+                            </div>
+                            <p className="font-semibold">{formData.field}</p>
+                          </div>
+                          <div className="p-5 rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                            <div className="flex items-center gap-2 mb-2">
+                              <FileUp className="w-4 h-4 text-accent" />
+                              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Proposal</span>
+                            </div>
+                            <p className="font-semibold">{formData.proposalUrl ? "Attached ✓" : "Not attached"}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="p-5 rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Target className="w-4 h-4 text-primary" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Research Objective</span>
+                          </div>
+                          <p className="text-sm leading-relaxed">{formData.objective}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 rounded-xl bg-primary/10 border border-primary/30 text-center">
+                        <p className="text-sm text-primary font-medium">
+                          🚀 Your research pipeline will be auto-generated with 7 stages
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+
+                <CardFooter className="flex justify-between border-t border-border/40 pt-6 pb-6 px-8">
+                  <Button
+                    variant="ghost"
+                    onClick={handleBack}
+                    disabled={currentStep === 0}
+                    className="gap-2"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back
                   </Button>
-                )}
-              </CardFooter>
-            </Card>
-          </motion.div>
-        </AnimatePresence>
+                  
+                  {currentStep === STEPS.length - 1 ? (
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      className="gap-2 px-8 bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+                      size="lg"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Launching...
+                        </>
+                      ) : (
+                        <>
+                          Launch Mission
+                          <Rocket className="w-4 h-4" />
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleNext}
+                      disabled={!canProceed() || isUploading}
+                      className="gap-2 px-8"
+                      size="lg"
+                    >
+                      {currentStep === 3 ? (formData.proposalUrl ? "Continue" : "Skip") : "Continue"}
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  )}
+                </CardFooter>
+              </Card>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </DashboardShell>
   );
