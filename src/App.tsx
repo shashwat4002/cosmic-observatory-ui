@@ -20,7 +20,6 @@ import Matching from "./pages/Matching";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import Admin from "./pages/Admin";
-import ProjectCreationWizard from "./pages/ProjectCreationWizard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -70,14 +69,6 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Projects />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/projects/new"
-            element={
-              <ProtectedRoute>
-                <ProjectCreationWizard />
               </ProtectedRoute>
             }
           />
