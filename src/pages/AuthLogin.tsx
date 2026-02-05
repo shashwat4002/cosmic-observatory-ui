@@ -6,16 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DashboardShell } from "@/components/DashboardShell";
-import { useAuthActions } from "@/hooks/use-auth";
+import { useAuthActions, useCurrentUser } from "@/hooks/use-auth";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
 
 const AuthLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login } = useAuthActions();
+  const { data, isLoading } = useCurrentUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!isLoading && data?.user) {
+      navigate("/dashboard");
+    }
+  }, [data, isLoading, navigate]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -98,20 +107,6 @@ const AuthLogin = () => {
           </form>
 
           <div className="space-y-3">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() =>
-                toast({
-                  title: "Google Sign-in",
-                  description:
-                    "The backend now verifies Google ID tokens at /api/auth/google. Wire this button to Google Identity Services to obtain an id_token and POST it there.",
-                })
-              }
-            >
-              Continue with Google
-            </Button>
             <p className="text-xs text-center text-muted-foreground">
               New to SochX?{" "}
               <Link
@@ -129,4 +124,3 @@ const AuthLogin = () => {
 };
 
 export default AuthLogin;
-

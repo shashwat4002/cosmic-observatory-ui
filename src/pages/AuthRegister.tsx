@@ -1,4 +1,4 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DashboardShell } from "@/components/DashboardShell";
-import { useAuthActions } from "@/hooks/use-auth";
+import { useAuthActions, useCurrentUser } from "@/hooks/use-auth";
 import { useToast } from "@/components/ui/use-toast";
 
 const AuthRegister = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { register } = useAuthActions();
+  const { data, isLoading } = useCurrentUser();
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -21,6 +22,13 @@ const AuthRegister = () => {
   const [intendedFieldOfStudy, setIntendedFieldOfStudy] = useState("");
   const [researchInterests, setResearchInterests] = useState("");
   const [skillTags, setSkillTags] = useState("");
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!isLoading && data?.user) {
+      navigate("/dashboard");
+    }
+  }, [data, isLoading, navigate]);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -42,9 +50,9 @@ const AuthRegister = () => {
       });
       toast({
         title: "Account created",
-        description: "Welcome to SochX – your research journey starts now.",
+        description: "Please check your email to verify your account before signing in.",
       });
-      navigate("/dashboard");
+      navigate("/auth/login");
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unable to register right now";
@@ -179,4 +187,3 @@ const AuthRegister = () => {
 };
 
 export default AuthRegister;
-

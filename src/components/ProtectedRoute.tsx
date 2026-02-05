@@ -16,6 +16,9 @@ export const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const location = useLocation();
   const { data, isLoading } = useCurrentUser();
+  
+  // Call hook at the top level unconditionally
+  useRealtimeNotifications();
 
   if (isLoading) {
     return (
@@ -44,8 +47,5 @@ export const ProtectedRoute = ({
     return <Navigate to="/dashboard" replace />;
   }
 
-  useRealtimeNotifications();
-
   return <>{children}</>;
 };
-
