@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from "@supabase/supabase-js";
+import { useEffect, useState, useCallback } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 export type AuthUser = {
   id: string;
@@ -13,49 +12,36 @@ export type AuthUser = {
   researchInterests?: string[];
   skillTags?: string[];
   currentJourneyStage?: string | null;
+  profilePhotoUrl?: string | null;
+};
+
+type AuthResponse = {
+  user: AuthUser;
 };
 
 export const useCurrentUser = () => {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Set up auth state listener BEFORE getting session
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setLoading(false);
-      }
-    );
-
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+  const fetchUser = useCallback(async () => {
+    try {
+      const response = await api.get<AuthResponse>("/auth/me");
+      setUser(response.user);
+    } catch {
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const user = session?.user;
-  const authUser: AuthUser | null = user
-    ? {
-        id: user.id,
-        email: user.email || "",
-        fullName: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
-        role: (user.user_metadata?.role as AuthUser["role"]) || "STUDENT_RESEARCHER",
-        academicLevel: user.user_metadata?.academic_level,
-        intendedFieldOfStudy: user.user_metadata?.intended_field_of_study,
-        researchInterests: user.user_metadata?.research_interests,
-        skillTags: user.user_metadata?.skill_tags,
-        currentJourneyStage: user.user_metadata?.current_journey_stage,
-      }
-    : null;
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   return {
-    data: { user: authUser },
-    isLoading: loading,
-    session,
+    data: { user },
+    isLoading,
+    refetch: fetchUser,
   };
 };
 
@@ -81,12 +67,11 @@ export const useAuthActions = () => {
 
   const login = useMutation({
     mutationFn: async (input: LoginInput) => {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const response = await api.post<AuthResponse>("/auth/login", {
         email: input.email,
         password: input.password,
       });
-      if (error) throw new Error(error.message);
-      return data;
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
@@ -95,23 +80,17 @@ export const useAuthActions = () => {
 
   const register = useMutation({
     mutationFn: async (input: RegisterInput) => {
-      const { data, error } = await supabase.auth.signUp({
+      const response = await api.post<AuthResponse>("/auth/register", {
         email: input.email,
         password: input.password,
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: {
-            full_name: input.fullName,
-            academic_level: input.academicLevel,
-            intended_field_of_study: input.intendedFieldOfStudy,
-            research_interests: input.researchInterests,
-            skill_tags: input.skillTags,
-            role: input.role || "STUDENT_RESEARCHER",
-          },
-        },
+        fullName: input.fullName,
+        academicLevel: input.academicLevel,
+        intendedFieldOfStudy: input.intendedFieldOfStudy,
+        researchInterests: input.researchInterests,
+        skillTags: input.skillTags,
+        role: input.role || "STUDENT_RESEARCHER",
       });
-      if (error) throw new Error(error.message);
-      return data;
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["currentUser"] });
@@ -120,8 +99,7 @@ export const useAuthActions = () => {
 
   const logout = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw new Error(error.message);
+      await api.post("/auth/logout");
     },
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ["currentUser"] });

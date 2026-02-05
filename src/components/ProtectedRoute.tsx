@@ -16,8 +16,8 @@ export const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const location = useLocation();
   const { data, isLoading } = useCurrentUser();
-  
-  // Call hook at the top level unconditionally
+
+  // Set up realtime notifications for authenticated users
   useRealtimeNotifications();
 
   if (isLoading) {

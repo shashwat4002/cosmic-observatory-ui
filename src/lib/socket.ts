@@ -9,8 +9,23 @@ export const getSocket = () => {
   if (!socket) {
     socket = io(SOCKET_URL, {
       withCredentials: true,
+      autoConnect: false,
     });
   }
   return socket;
 };
 
+export const connectSocket = () => {
+  const s = getSocket();
+  if (!s.connected) {
+    s.connect();
+  }
+};
+
+export const disconnectSocket = () => {
+  if (socket?.connected) {
+    socket.disconnect();
+  }
+};
+
+export { socket };

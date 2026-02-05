@@ -1,48 +1,58 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { getSocket } from "@/lib/socket";
+import { getSocket, connectSocket, disconnectSocket } from "@/lib/socket";
+import { useCurrentUser } from "./use-auth";
+
+export type Notification = {
+  id: string;
+  type: string;
+  message: string;
+  payload?: Record<string, unknown>;
+  createdAt: string;
+  readAt?: string | null;
+};
 
 export const useRealtimeNotifications = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { data } = useCurrentUser();
 
-  useEffect(() => {
-    const socket = getSocket();
-
-    const handler = (notification: {
-      id: string;
-      message: string;
-      type: string;
-      createdAt: string;
-      readAt?: string | null;
-    }) => {
+  const handleNotification = useCallback(
+    (notification: Notification) => {
       queryClient.setQueryData(
         ["notifications"],
-        (existing:
-          | { notifications: typeof notification[] }
-          | undefined
-          | null) => {
+        (existing: { notifications: Notification[] } | undefined | null) => {
           if (!existing) {
             return { notifications: [notification] };
           }
           return {
             notifications: [notification, ...existing.notifications],
           };
-        },
+        }
       );
 
       toast({
-        title: "New notification",
+        title: "New Notification",
         description: notification.message,
       });
-    };
+    },
+    [queryClient, toast]
+  );
 
-    socket.on("notification", handler);
+  useEffect(() => {
+    // Only connect socket if user is authenticated
+    if (!data?.user) return;
+
+    connectSocket();
+    const socket = getSocket();
+
+    socket.on("notification", handleNotification);
 
     return () => {
-      socket.off("notification", handler);
+      socket.off("notification", handleNotification);
+      disconnectSocket();
     };
-  }, [queryClient, toast]);
+  }, [data?.user, handleNotification]);
 };
 
