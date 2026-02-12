@@ -211,7 +211,7 @@
                   initial={{ height: 0 }}
                   animate={{ height: `${height}%` }}
                   transition={{ duration: 0.8, delay: 1 + i * 0.1 }}
-                  className="w-6 rounded-t-md bg-gradient-to-t from-[hsl(var(--glow-cyan)/0.6)] to-[hsl(var(--glow-cyan))] shadow-[0_0_10px_hsl(var(--glow-cyan)/0.4)]"
+                  className="w-6 rounded-t-md bg-gradient-to-t from-cyan-500 to-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.5)]"
                 />
               ))}
             </div>
@@ -246,9 +246,9 @@
  
 const ProgressBar = ({ label, value, color, delay }: { label: string; value: number; color: string; delay: number }) => {
     const colorMap = {
-      primary: { bar: 'from-[hsl(var(--glow-cyan)/0.7)] to-[hsl(var(--glow-cyan))]', shadow: 'shadow-[0_0_10px_hsl(var(--glow-cyan)/0.4)]' },
-      secondary: { bar: 'from-[hsl(var(--glow-blue)/0.7)] to-[hsl(var(--glow-blue))]', shadow: 'shadow-[0_0_10px_hsl(var(--glow-blue)/0.4)]' },
-      accent: { bar: 'from-[hsl(var(--glow-purple)/0.7)] to-[hsl(var(--glow-purple))]', shadow: 'shadow-[0_0_10px_hsl(var(--glow-purple)/0.4)]' },
+      primary: { bar: 'from-cyan-400 to-cyan-300', shadow: 'shadow-[0_0_12px_rgba(34,211,238,0.5)]' },
+      secondary: { bar: 'from-blue-500 to-blue-400', shadow: 'shadow-[0_0_12px_rgba(59,130,246,0.5)]' },
+      accent: { bar: 'from-purple-500 to-purple-400', shadow: 'shadow-[0_0_12px_rgba(168,85,247,0.5)]' },
     };
 
     const c = colorMap[color as keyof typeof colorMap];
