@@ -170,71 +170,72 @@
          style={{ rotateX, rotateY }}
          className="preserve-3d"
        >
-         {/* Main Dashboard Card */}
-         <motion.div
-           initial={{ opacity: 0, scale: 0.9 }}
-           animate={{ opacity: 1, scale: 1 }}
-           transition={{ duration: 0.8, delay: 0.5 }}
-           className="relative glass-strong rounded-2xl p-6 glow-border"
-         >
-           {/* Header */}
-           <div className="flex items-center justify-between mb-6">
-             <div className="flex items-center gap-3">
-               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                 <Activity className="w-5 h-5 text-primary-foreground" />
-               </div>
-               <div>
-                 <div className="text-sm font-medium text-foreground">Research Dashboard</div>
-                 <div className="text-xs text-muted-foreground">Live Analytics</div>
-               </div>
-             </div>
-             <div className="flex gap-2">
-               <div className="w-3 h-3 rounded-full bg-destructive/50" />
-               <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
-               <div className="w-3 h-3 rounded-full bg-green-500/50" />
-             </div>
-           </div>
- 
-           {/* Progress Bars */}
-           <div className="space-y-4 mb-6">
-             <ProgressBar label="Neural Networks" value={87} color="primary" delay={0.6} />
-             <ProgressBar label="Data Analysis" value={65} color="secondary" delay={0.8} />
-             <ProgressBar label="ML Models" value={92} color="accent" delay={1} />
-           </div>
- 
-           {/* Chart placeholder */}
-           <div className="h-32 rounded-xl bg-muted/30 flex items-end justify-around p-4 gap-2">
-             {[40, 65, 45, 80, 55, 75, 90].map((height, i) => (
-               <motion.div
-                 key={i}
-                 initial={{ height: 0 }}
-                 animate={{ height: `${height}%` }}
-                 transition={{ duration: 0.8, delay: 1 + i * 0.1 }}
-                 className="w-6 rounded-t-md bg-gradient-to-t from-primary/50 to-primary"
-               />
-             ))}
-           </div>
-         </motion.div>
+          {/* Main Dashboard Card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="relative rounded-2xl p-6 border border-[hsl(var(--glow-cyan)/0.4)] shadow-[0_0_40px_hsl(var(--glow-cyan)/0.15),inset_0_1px_0_hsl(var(--star-white)/0.1)]"
+            style={{ background: 'linear-gradient(135deg, hsl(216 60% 15% / 0.95), hsl(220 70% 8% / 0.95))' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(var(--glow-cyan))] to-[hsl(var(--glow-blue))] flex items-center justify-center shadow-[0_0_20px_hsl(var(--glow-cyan)/0.5)]">
+                  <Activity className="w-5 h-5 text-[hsl(var(--deep-navy))]" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-[hsl(var(--star-white))]">Research Dashboard</div>
+                  <div className="text-xs text-[hsl(var(--glow-cyan)/0.7)]">Live Analytics</div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-destructive shadow-[0_0_8px_hsl(0_84%_60%/0.6)]" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400 shadow-[0_0_8px_hsl(45_100%_50%/0.6)]" />
+                <div className="w-3 h-3 rounded-full bg-green-400 shadow-[0_0_8px_hsl(142_70%_50%/0.6)]" />
+              </div>
+            </div>
+
+            {/* Progress Bars */}
+            <div className="space-y-4 mb-6">
+              <ProgressBar label="Neural Networks" value={87} color="primary" delay={0.6} />
+              <ProgressBar label="Data Analysis" value={65} color="secondary" delay={0.8} />
+              <ProgressBar label="ML Models" value={92} color="accent" delay={1} />
+            </div>
+
+            {/* Chart placeholder */}
+            <div className="h-32 rounded-xl bg-[hsl(var(--midnight)/0.6)] border border-[hsl(var(--glass-border)/0.3)] flex items-end justify-around p-4 gap-2">
+              {[40, 65, 45, 80, 55, 75, 90].map((height, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ height: 0 }}
+                  animate={{ height: `${height}%` }}
+                  transition={{ duration: 0.8, delay: 1 + i * 0.1 }}
+                  className="w-6 rounded-t-md bg-gradient-to-t from-[hsl(var(--glow-cyan)/0.6)] to-[hsl(var(--glow-cyan))] shadow-[0_0_10px_hsl(var(--glow-cyan)/0.4)]"
+                />
+              ))}
+            </div>
+          </motion.div>
  
          {/* Floating Notification */}
          <FloatingNotification />
  
-         {/* Floating Stats Card */}
-         <motion.div
-           initial={{ opacity: 0, x: 30 }}
-           animate={{ opacity: 1, x: 0 }}
-           transition={{ duration: 0.6, delay: 1.2 }}
-           className="absolute -right-8 top-1/4 glass rounded-xl p-4 glow-cyan"
-           style={{ transform: 'translateZ(40px)' }}
-         >
-           <div className="flex items-center gap-3">
-             <TrendingUp className="w-5 h-5 text-primary" />
-             <div>
-               <div className="text-lg font-bold text-foreground">+24.5%</div>
-               <div className="text-xs text-muted-foreground">This week</div>
-             </div>
-           </div>
-         </motion.div>
+          {/* Floating Stats Card - repositioned to avoid overlap */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+            className="absolute -right-4 -top-4 rounded-xl p-3 border border-[hsl(var(--glow-cyan)/0.4)] shadow-[0_0_25px_hsl(var(--glow-cyan)/0.2)]"
+            style={{ transform: 'translateZ(40px)', background: 'linear-gradient(135deg, hsl(216 60% 15% / 0.95), hsl(220 70% 8% / 0.95))' }}
+          >
+            <div className="flex items-center gap-3">
+              <TrendingUp className="w-5 h-5 text-[hsl(var(--glow-cyan))] drop-shadow-[0_0_6px_hsl(var(--glow-cyan)/0.6)]" />
+              <div>
+                <div className="text-lg font-bold text-[hsl(var(--glow-cyan))]">+24.5%</div>
+                <div className="text-xs text-[hsl(var(--star-white)/0.6)]">This week</div>
+              </div>
+            </div>
+          </motion.div>
        </motion.div>
  
        {/* Glow effect behind dashboard */}
@@ -243,30 +244,32 @@
    );
  };
  
- const ProgressBar = ({ label, value, color, delay }: { label: string; value: number; color: string; delay: number }) => {
-   const colorMap = {
-     primary: 'from-primary to-primary/70',
-     secondary: 'from-secondary to-secondary/70',
-     accent: 'from-accent to-accent/70',
-   };
- 
-   return (
-     <div>
-       <div className="flex justify-between text-sm mb-1">
-         <span className="text-muted-foreground">{label}</span>
-         <span className="text-foreground font-medium">{value}%</span>
-       </div>
-       <div className="h-2 rounded-full bg-muted/50 overflow-hidden">
-         <motion.div
-           initial={{ width: 0 }}
-           animate={{ width: `${value}%` }}
-           transition={{ duration: 1, delay, ease: "easeOut" }}
-           className={`h-full rounded-full bg-gradient-to-r ${colorMap[color as keyof typeof colorMap]}`}
-         />
-       </div>
-     </div>
-   );
- };
+const ProgressBar = ({ label, value, color, delay }: { label: string; value: number; color: string; delay: number }) => {
+    const colorMap = {
+      primary: { bar: 'from-[hsl(var(--glow-cyan)/0.7)] to-[hsl(var(--glow-cyan))]', shadow: 'shadow-[0_0_10px_hsl(var(--glow-cyan)/0.4)]' },
+      secondary: { bar: 'from-[hsl(var(--glow-blue)/0.7)] to-[hsl(var(--glow-blue))]', shadow: 'shadow-[0_0_10px_hsl(var(--glow-blue)/0.4)]' },
+      accent: { bar: 'from-[hsl(var(--glow-purple)/0.7)] to-[hsl(var(--glow-purple))]', shadow: 'shadow-[0_0_10px_hsl(var(--glow-purple)/0.4)]' },
+    };
+
+    const c = colorMap[color as keyof typeof colorMap];
+
+    return (
+      <div>
+        <div className="flex justify-between text-sm mb-1">
+          <span className="text-[hsl(var(--star-white)/0.7)]">{label}</span>
+          <span className="text-[hsl(var(--star-white))] font-semibold">{value}%</span>
+        </div>
+        <div className="h-2.5 rounded-full bg-[hsl(var(--midnight)/0.6)] overflow-hidden border border-[hsl(var(--glass-border)/0.2)]">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${value}%` }}
+            transition={{ duration: 1, delay, ease: "easeOut" }}
+            className={`h-full rounded-full bg-gradient-to-r ${c.bar} ${c.shadow}`}
+          />
+        </div>
+      </div>
+    );
+  };
  
  const FloatingNotification = () => {
    const [isVisible, setIsVisible] = useState(false);
@@ -287,31 +290,31 @@
      };
    }, []);
  
-   return (
-     <motion.div
-       initial={{ opacity: 0, x: -30, y: 0 }}
-       animate={{ 
-         opacity: isVisible ? 1 : 0, 
-         x: isVisible ? 0 : -30,
-       }}
-       transition={{ duration: 0.4 }}
-       className="absolute -left-6 bottom-1/4 glass rounded-xl p-3 flex items-center gap-3"
-       style={{ transform: 'translateZ(60px)' }}
-     >
-       <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-         <Bell className="w-4 h-4 text-primary" />
-       </div>
-       <div>
-         <div className="text-xs font-medium text-foreground">New Citation</div>
-         <div className="text-xs text-muted-foreground">Paper referenced 12 times</div>
-       </div>
-       {/* Progress bar */}
-       <motion.div 
-         className="absolute bottom-0 left-0 h-[2px] bg-primary rounded-full"
-         initial={{ width: '100%' }}
-         animate={{ width: isVisible ? '0%' : '100%' }}
-         transition={{ duration: 4, ease: 'linear' }}
-       />
-     </motion.div>
-   );
- };
+    return (
+      <motion.div
+        initial={{ opacity: 0, x: -30, y: 0 }}
+        animate={{ 
+          opacity: isVisible ? 1 : 0, 
+          x: isVisible ? 0 : -30,
+        }}
+        transition={{ duration: 0.4 }}
+        className="absolute -left-6 bottom-1/4 rounded-xl p-3 flex items-center gap-3 border border-[hsl(var(--glow-cyan)/0.3)] shadow-[0_0_20px_hsl(var(--glow-cyan)/0.15)]"
+        style={{ transform: 'translateZ(60px)', background: 'linear-gradient(135deg, hsl(216 60% 15% / 0.95), hsl(220 70% 8% / 0.95))' }}
+      >
+        <div className="w-8 h-8 rounded-lg bg-[hsl(var(--glow-cyan)/0.2)] flex items-center justify-center">
+          <Bell className="w-4 h-4 text-[hsl(var(--glow-cyan))] drop-shadow-[0_0_4px_hsl(var(--glow-cyan)/0.6)]" />
+        </div>
+        <div>
+          <div className="text-xs font-semibold text-[hsl(var(--star-white))]">New Citation</div>
+          <div className="text-xs text-[hsl(var(--star-white)/0.5)]">Paper referenced 12 times</div>
+        </div>
+        {/* Progress bar */}
+        <motion.div 
+          className="absolute bottom-0 left-0 h-[2px] bg-[hsl(var(--glow-cyan))] rounded-full shadow-[0_0_6px_hsl(var(--glow-cyan)/0.5)]"
+          initial={{ width: '100%' }}
+          animate={{ width: isVisible ? '0%' : '100%' }}
+          transition={{ duration: 4, ease: 'linear' }}
+        />
+      </motion.div>
+    );
+  };
