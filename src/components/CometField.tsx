@@ -57,7 +57,11 @@ function dist(x1: number, y1: number, x2: number, y2: number) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
 
-const CometFieldComponent = () => {
+interface CometFieldProps {
+  onRevealStateChange?: (active: boolean) => void;
+}
+
+const CometFieldComponent = ({ onRevealStateChange }: CometFieldProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isMobile = useIsMobile();
   const cometsRef = useRef<Comet[]>([]);
@@ -75,6 +79,7 @@ const CometFieldComponent = () => {
   const lastBrandRevealRef = useRef(0);
   const [showBrandReveal, setShowBrandReveal] = useState(false);
   const dimFactorRef = useRef(1); // 1 = full brightness, 0 = dimmed for brand reveal
+  const revealBoostRef = useRef(0); // 0 = normal, 1 = full 3D burst mode
 
   const COMET_COUNT = isMobile ? 10 : 24;
   const TRAIL_LENGTH = isMobile ? 20 : 40;
@@ -282,15 +287,35 @@ const CometFieldComponent = () => {
           if (now - lastBrandRevealRef.current > BRAND_REVEAL_INTERVAL) {
             lastBrandRevealRef.current = now;
             setShowBrandReveal(true);
-            // Dim comets during brand reveal
-            dimFactorRef.current = 0.15;
+            onRevealStateChange?.(true);
+            // Boost comets into 3D burst mode instead of dimming
+            dimFactorRef.current = 1.5; // brighter
+            revealBoostRef.current = 1;
+            // Make all comets dramatically scale and sweep
+            for (const comet of cometsRef.current) {
+              comet.targetScale = 2.5 + Math.random() * 2.5; // 2.5x–5x size
+              comet.vx = (Math.random() - 0.5) * 4; // faster lateral sweep
+              comet.vy = (Math.random() - 0.5) * 3;
+              comet.sinAmp = 1.5 + Math.random() * 2; // big sweeping arcs
+              comet.sinSpeed = 0.8 + Math.random() * 0.6;
+              comet.targetGlowRadius = (20 + Math.random() * 20) * DEPTH_LAYERS[comet.depthLayer].glowMult * 2.5;
+            }
             setTimeout(() => {
               setShowBrandReveal(false);
-              // Gradually restore
+              onRevealStateChange?.(false);
+              // Gradually restore all comets
+              for (const comet of cometsRef.current) {
+                comet.targetScale = 1;
+                comet.sinAmp = 0.15 + Math.random() * 0.3;
+                comet.sinSpeed = 0.3 + Math.random() * 0.5;
+                const layer = DEPTH_LAYERS[comet.depthLayer];
+                comet.targetGlowRadius = (12 + Math.random() * 12) * layer.glowMult;
+              }
               const restore = () => {
                 dimFactorRef.current = lerp(dimFactorRef.current, 1, 0.05);
-                if (dimFactorRef.current < 0.95) requestAnimationFrame(restore);
-                else dimFactorRef.current = 1;
+                revealBoostRef.current = lerp(revealBoostRef.current, 0, 0.05);
+                if (dimFactorRef.current > 1.02 || revealBoostRef.current > 0.02) requestAnimationFrame(restore);
+                else { dimFactorRef.current = 1; revealBoostRef.current = 0; }
               };
               requestAnimationFrame(restore);
             }, 3500);
@@ -325,7 +350,8 @@ const CometFieldComponent = () => {
         c.vy *= 0.997;
 
         const speed = Math.sqrt(c.vx ** 2 + c.vy ** 2);
-        const maxSpeed = 1.5 * layer.speedMult + 0.5;
+        const boostSpeed = revealBoostRef.current > 0.1 ? 3 : 0;
+        const maxSpeed = 1.5 * layer.speedMult + 0.5 + boostSpeed;
         if (speed < 0.08) {
           c.vx += (Math.random() - 0.5) * 0.05;
           c.vy += (Math.random() - 0.5) * 0.05;
@@ -343,7 +369,7 @@ const CometFieldComponent = () => {
           c.targetScale = 1.3;
           setTimeout(() => { c.targetScale = 1; }, 2000);
         }
-        c.scale = lerp(c.scale, c.targetScale, 0.02);
+        c.scale = lerp(c.scale, c.targetScale, revealBoostRef.current > 0.1 ? 0.04 : 0.02);
 
         // Wrap edges
         if (c.x < -30) c.x = w + 30;
@@ -377,9 +403,10 @@ const CometFieldComponent = () => {
 
         if (c.collisionCooldown > 0) c.collisionCooldown--;
 
+        const boostTrailLen = revealBoostRef.current > 0.1 ? Math.floor(TRAIL_LENGTH * 2.5) : TRAIL_LENGTH;
         c.trail.unshift({ x: c.x, y: c.y, alpha: 1 });
-        if (c.trail.length > TRAIL_LENGTH) c.trail.pop();
-        for (const t of c.trail) t.alpha *= 0.94;
+        if (c.trail.length > boostTrailLen) c.trail.pop();
+        for (const t of c.trail) t.alpha *= (revealBoostRef.current > 0.1 ? 0.97 : 0.94);
 
         // Proximity flash on collision
         if (c.collisionCooldown <= 0 && now - lastCollisionRef.current > 1800) {
