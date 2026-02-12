@@ -171,71 +171,72 @@
          className="preserve-3d"
        >
           {/* Main Dashboard Card */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="relative rounded-2xl p-6 border border-[hsl(var(--glow-cyan)/0.4)] shadow-[0_0_40px_hsl(var(--glow-cyan)/0.15),inset_0_1px_0_hsl(var(--star-white)/0.1)]"
-            style={{ background: 'linear-gradient(135deg, hsl(216 60% 15% / 0.95), hsl(220 70% 8% / 0.95))' }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[hsl(var(--glow-cyan))] to-[hsl(var(--glow-blue))] flex items-center justify-center shadow-[0_0_20px_hsl(var(--glow-cyan)/0.5)]">
-                  <Activity className="w-5 h-5 text-[hsl(var(--deep-navy))]" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-[hsl(var(--star-white))]">Research Dashboard</div>
-                  <div className="text-xs text-[hsl(var(--glow-cyan)/0.7)]">Live Analytics</div>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-destructive shadow-[0_0_8px_hsl(0_84%_60%/0.6)]" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400 shadow-[0_0_8px_hsl(45_100%_50%/0.6)]" />
-                <div className="w-3 h-3 rounded-full bg-green-400 shadow-[0_0_8px_hsl(142_70%_50%/0.6)]" />
-              </div>
-            </div>
+           <motion.div
+             initial={{ opacity: 0, scale: 0.9 }}
+             animate={{ opacity: 1, scale: 1 }}
+             transition={{ duration: 0.8, delay: 0.5 }}
+             className="relative rounded-2xl p-6 border border-cyan-500/40"
+             style={{ background: 'linear-gradient(135deg, #0f1a2e 0%, #081020 100%)', boxShadow: '0 0 40px rgba(6,182,212,0.15), inset 0 1px 0 rgba(255,255,255,0.1)' }}
+           >
+             {/* Header */}
+             <div className="flex items-center justify-between mb-6">
+               <div className="flex items-center gap-3">
+                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #06b6d4, #3b82f6)', boxShadow: '0 0 20px rgba(6,182,212,0.5)' }}>
+                   <Activity className="w-5 h-5 text-white" />
+                 </div>
+                 <div>
+                   <div className="text-sm font-semibold text-white">Research Dashboard</div>
+                   <div className="text-xs text-cyan-400/70">Live Analytics</div>
+                 </div>
+               </div>
+               <div className="flex gap-2">
+                 <div className="w-3 h-3 rounded-full bg-red-500" style={{ boxShadow: '0 0 8px rgba(239,68,68,0.6)' }} />
+                 <div className="w-3 h-3 rounded-full bg-yellow-400" style={{ boxShadow: '0 0 8px rgba(250,204,21,0.6)' }} />
+                 <div className="w-3 h-3 rounded-full bg-green-400" style={{ boxShadow: '0 0 8px rgba(74,222,128,0.6)' }} />
+               </div>
+             </div>
 
-            {/* Progress Bars */}
-            <div className="space-y-4 mb-6">
-              <ProgressBar label="Neural Networks" value={87} color="primary" delay={0.6} />
-              <ProgressBar label="Data Analysis" value={65} color="secondary" delay={0.8} />
-              <ProgressBar label="ML Models" value={92} color="accent" delay={1} />
-            </div>
+             {/* Progress Bars */}
+             <div className="space-y-4 mb-6">
+               <ProgressBar label="Neural Networks" value={87} color="cyan" delay={0.6} />
+               <ProgressBar label="Data Analysis" value={65} color="blue" delay={0.8} />
+               <ProgressBar label="ML Models" value={92} color="purple" delay={1} />
+             </div>
 
-            {/* Chart placeholder */}
-            <div className="h-32 rounded-xl bg-[hsl(var(--midnight)/0.6)] border border-[hsl(var(--glass-border)/0.3)] flex items-end justify-around p-4 gap-2">
-              {[40, 65, 45, 80, 55, 75, 90].map((height, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ height: 0 }}
-                  animate={{ height: `${height}%` }}
-                  transition={{ duration: 0.8, delay: 1 + i * 0.1 }}
-                  className="w-6 rounded-t-md bg-gradient-to-t from-cyan-500 to-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.5)]"
-                />
-              ))}
-            </div>
-          </motion.div>
+             {/* Bar Chart */}
+             <div className="h-32 rounded-xl p-4 flex items-end justify-around gap-2" style={{ background: 'rgba(8,16,32,0.7)', border: '1px solid rgba(6,182,212,0.15)' }}>
+               {[40, 65, 45, 80, 55, 75, 90].map((height, i) => (
+                 <motion.div
+                   key={i}
+                   initial={{ height: 0 }}
+                   animate={{ height: `${height}%` }}
+                   transition={{ duration: 0.8, delay: 1 + i * 0.1 }}
+                   className="w-6 rounded-t-md"
+                   style={{ background: 'linear-gradient(to top, #0891b2, #22d3ee)', boxShadow: '0 0 12px rgba(34,211,238,0.5)' }}
+                 />
+               ))}
+             </div>
+           </motion.div>
  
          {/* Floating Notification */}
          <FloatingNotification />
  
           {/* Floating Stats Card - repositioned to avoid overlap */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-            className="absolute -right-4 -top-4 rounded-xl p-3 border border-[hsl(var(--glow-cyan)/0.4)] shadow-[0_0_25px_hsl(var(--glow-cyan)/0.2)]"
-            style={{ transform: 'translateZ(40px)', background: 'linear-gradient(135deg, hsl(216 60% 15% / 0.95), hsl(220 70% 8% / 0.95))' }}
-          >
-            <div className="flex items-center gap-3">
-              <TrendingUp className="w-5 h-5 text-[hsl(var(--glow-cyan))] drop-shadow-[0_0_6px_hsl(var(--glow-cyan)/0.6)]" />
-              <div>
-                <div className="text-lg font-bold text-[hsl(var(--glow-cyan))]">+24.5%</div>
-                <div className="text-xs text-[hsl(var(--star-white)/0.6)]">This week</div>
-              </div>
-            </div>
-          </motion.div>
+           <motion.div
+             initial={{ opacity: 0, x: 30 }}
+             animate={{ opacity: 1, x: 0 }}
+             transition={{ duration: 0.6, delay: 1.2 }}
+             className="absolute -right-4 -top-4 rounded-xl p-3 border border-cyan-500/40"
+             style={{ transform: 'translateZ(40px)', background: 'linear-gradient(135deg, #0f1a2e, #081020)', boxShadow: '0 0 25px rgba(6,182,212,0.2)' }}
+           >
+             <div className="flex items-center gap-3">
+               <TrendingUp className="w-5 h-5 text-cyan-400" style={{ filter: 'drop-shadow(0 0 6px rgba(6,182,212,0.6))' }} />
+               <div>
+                 <div className="text-lg font-bold text-cyan-400">+24.5%</div>
+                 <div className="text-xs text-white/60">This week</div>
+               </div>
+             </div>
+           </motion.div>
        </motion.div>
  
        {/* Glow effect behind dashboard */}
@@ -245,26 +246,27 @@
  };
  
 const ProgressBar = ({ label, value, color, delay }: { label: string; value: number; color: string; delay: number }) => {
-    const colorMap = {
-      primary: { bar: 'from-cyan-400 to-cyan-300', shadow: 'shadow-[0_0_12px_rgba(34,211,238,0.5)]' },
-      secondary: { bar: 'from-blue-500 to-blue-400', shadow: 'shadow-[0_0_12px_rgba(59,130,246,0.5)]' },
-      accent: { bar: 'from-purple-500 to-purple-400', shadow: 'shadow-[0_0_12px_rgba(168,85,247,0.5)]' },
+    const colorMap: Record<string, { gradient: string; shadow: string }> = {
+      cyan: { gradient: 'linear-gradient(to right, #0891b2, #22d3ee)', shadow: '0 0 12px rgba(34,211,238,0.5)' },
+      blue: { gradient: 'linear-gradient(to right, #2563eb, #3b82f6)', shadow: '0 0 12px rgba(59,130,246,0.5)' },
+      purple: { gradient: 'linear-gradient(to right, #7c3aed, #a855f7)', shadow: '0 0 12px rgba(168,85,247,0.5)' },
     };
 
-    const c = colorMap[color as keyof typeof colorMap];
+    const c = colorMap[color] || colorMap.cyan;
 
     return (
       <div>
         <div className="flex justify-between text-sm mb-1">
-          <span className="text-[hsl(var(--star-white)/0.7)]">{label}</span>
-          <span className="text-[hsl(var(--star-white))] font-semibold">{value}%</span>
+          <span className="text-white/70">{label}</span>
+          <span className="text-white font-semibold">{value}%</span>
         </div>
-        <div className="h-2.5 rounded-full bg-[hsl(var(--midnight)/0.6)] overflow-hidden border border-[hsl(var(--glass-border)/0.2)]">
+        <div className="h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(8,16,32,0.7)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${value}%` }}
             transition={{ duration: 1, delay, ease: "easeOut" }}
-            className={`h-full rounded-full bg-gradient-to-r ${c.bar} ${c.shadow}`}
+            className="h-full rounded-full"
+            style={{ background: c.gradient, boxShadow: c.shadow }}
           />
         </div>
       </div>
@@ -290,31 +292,31 @@ const ProgressBar = ({ label, value, color, delay }: { label: string; value: num
      };
    }, []);
  
-    return (
-      <motion.div
-        initial={{ opacity: 0, x: -30, y: 0 }}
-        animate={{ 
-          opacity: isVisible ? 1 : 0, 
-          x: isVisible ? 0 : -30,
-        }}
-        transition={{ duration: 0.4 }}
-        className="absolute -left-6 bottom-1/4 rounded-xl p-3 flex items-center gap-3 border border-[hsl(var(--glow-cyan)/0.3)] shadow-[0_0_20px_hsl(var(--glow-cyan)/0.15)]"
-        style={{ transform: 'translateZ(60px)', background: 'linear-gradient(135deg, hsl(216 60% 15% / 0.95), hsl(220 70% 8% / 0.95))' }}
-      >
-        <div className="w-8 h-8 rounded-lg bg-[hsl(var(--glow-cyan)/0.2)] flex items-center justify-center">
-          <Bell className="w-4 h-4 text-[hsl(var(--glow-cyan))] drop-shadow-[0_0_4px_hsl(var(--glow-cyan)/0.6)]" />
-        </div>
-        <div>
-          <div className="text-xs font-semibold text-[hsl(var(--star-white))]">New Citation</div>
-          <div className="text-xs text-[hsl(var(--star-white)/0.5)]">Paper referenced 12 times</div>
-        </div>
-        {/* Progress bar */}
-        <motion.div 
-          className="absolute bottom-0 left-0 h-[2px] bg-[hsl(var(--glow-cyan))] rounded-full shadow-[0_0_6px_hsl(var(--glow-cyan)/0.5)]"
-          initial={{ width: '100%' }}
-          animate={{ width: isVisible ? '0%' : '100%' }}
-          transition={{ duration: 4, ease: 'linear' }}
-        />
-      </motion.div>
-    );
-  };
+     return (
+       <motion.div
+         initial={{ opacity: 0, x: -30, y: 0 }}
+         animate={{ 
+           opacity: isVisible ? 1 : 0, 
+           x: isVisible ? 0 : -30,
+         }}
+         transition={{ duration: 0.4 }}
+         className="absolute -left-6 bottom-1/4 rounded-xl p-3 flex items-center gap-3 border border-cyan-500/30"
+         style={{ transform: 'translateZ(60px)', background: 'linear-gradient(135deg, #0f1a2e, #081020)', boxShadow: '0 0 20px rgba(6,182,212,0.15)' }}
+       >
+         <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(6,182,212,0.2)' }}>
+           <Bell className="w-4 h-4 text-cyan-400" style={{ filter: 'drop-shadow(0 0 4px rgba(6,182,212,0.6))' }} />
+         </div>
+         <div>
+           <div className="text-xs font-semibold text-white">New Citation</div>
+           <div className="text-xs text-white/50">Paper referenced 12 times</div>
+         </div>
+         <motion.div 
+           className="absolute bottom-0 left-0 h-[2px] rounded-full"
+           style={{ background: '#22d3ee', boxShadow: '0 0 6px rgba(34,211,238,0.5)' }}
+           initial={{ width: '100%' }}
+           animate={{ width: isVisible ? '0%' : '100%' }}
+           transition={{ duration: 4, ease: 'linear' }}
+         />
+       </motion.div>
+     );
+   };
