@@ -52,7 +52,7 @@ export const DashboardShell = ({ children, className }: DashboardShellProps) => 
   const { logout } = useAuthActions();
 
   const user = data?.user;
-  const isAdmin = user?.role === "ADMIN";
+  const isAdmin = user?.role === "admin";
 
   const handleLogout = async () => {
     await logout.mutateAsync();

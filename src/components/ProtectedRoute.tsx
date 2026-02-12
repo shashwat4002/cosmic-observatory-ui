@@ -43,7 +43,7 @@ export const ProtectedRoute = ({
     );
   }
 
-  if (requireAdmin && user.role !== "ADMIN") {
+  if (requireAdmin && user.role !== "admin") {
     return <Navigate to="/dashboard" replace />;
   }
 

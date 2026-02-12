@@ -168,15 +168,15 @@ const ProjectCreationWizard = () => {
 
       // Create project in Supabase
       const { data: project, error: projectError } = await supabase
-        .from('research_projects')
+        .from('projects')
         .insert({
           owner_id: user.id,
           title: formData.title,
           description: formData.objective,
-          objectives: formData.objective,
-          tags: aiAnalysis?.tags || [formData.field.toLowerCase()],
+          field: formData.field,
+          objective: formData.objective,
           status: 'active',
-          progress_percentage: 0,
+          current_stage: 'EXPLORATION',
         })
         .select()
         .single();
@@ -185,32 +185,21 @@ const ProjectCreationWizard = () => {
 
       // Create pipeline stages
       if (aiAnalysis?.stages && project) {
-        type StageStatus = "not_started" | "in_progress" | "review" | "completed";
         const stageInserts = aiAnalysis.stages.map((stage) => ({
           project_id: project.id,
-          name: stage.name,
-          description: stage.description,
-          order_index: stage.order_index,
-          status: (stage.order_index === 0 ? 'in_progress' : 'not_started') as StageStatus,
+          stage: stage.name.toUpperCase().replace(/ /g, '_'),
+          completion: stage.order_index === 0 ? 10 : 0,
+          milestone_title: stage.description,
         }));
 
         const { error: stagesError } = await supabase
-          .from('pipeline_stages')
+          .from('research_stage_progress')
           .insert(stageInserts);
 
         if (stagesError) {
           console.error('Stages error:', stagesError);
         }
       }
-
-      // Log activity
-      await supabase.from('activity_feed').insert({
-        user_id: user.id,
-        activity_type: 'project_created',
-        title: 'Created new research project',
-        description: formData.title,
-        related_project_id: project.id,
-      });
 
       toast({
         title: "Mission Launched! 🚀",

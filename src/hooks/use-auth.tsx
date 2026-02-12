@@ -7,7 +7,7 @@ export type AuthUser = {
   id: string;
   email: string;
   fullName: string;
-  role: "STUDENT_RESEARCHER" | "MENTOR" | "ADMIN";
+  role: "admin" | "moderator" | "user";
   academicLevel?: string | null;
   intendedFieldOfStudy?: string | null;
   researchInterests?: string[];
@@ -18,37 +18,59 @@ export type AuthUser = {
 export const useCurrentUser = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<Record<string, unknown> | null>(null);
+  const [role, setRole] = useState<AuthUser["role"]>("user");
 
   useEffect(() => {
-    // Set up auth state listener BEFORE getting session
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
-        setLoading(false);
+        if (!session?.user) {
+          setProfile(null);
+          setRole("user");
+          setLoading(false);
+        }
       }
     );
 
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setLoading(false);
+      if (!session?.user) setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Fetch profile and role from DB when session changes
+  useEffect(() => {
+    if (!session?.user) return;
+
+    const fetchProfileAndRole = async () => {
+      const [profileRes, roleRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", session.user.id).single(),
+        supabase.from("user_roles").select("role").eq("user_id", session.user.id).single(),
+      ]);
+
+      if (profileRes.data) setProfile(profileRes.data);
+      if (roleRes.data) setRole(roleRes.data.role as AuthUser["role"]);
+      setLoading(false);
+    };
+
+    fetchProfileAndRole();
+  }, [session?.user?.id]);
 
   const user = session?.user;
   const authUser: AuthUser | null = user
     ? {
         id: user.id,
         email: user.email || "",
-        fullName: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
-        role: (user.user_metadata?.role as AuthUser["role"]) || "STUDENT_RESEARCHER",
-        academicLevel: user.user_metadata?.academic_level,
-        intendedFieldOfStudy: user.user_metadata?.intended_field_of_study,
-        researchInterests: user.user_metadata?.research_interests,
-        skillTags: user.user_metadata?.skill_tags,
-        currentJourneyStage: user.user_metadata?.current_journey_stage,
+        fullName: (profile?.full_name as string) || user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
+        role,
+        academicLevel: profile?.academic_level as string | null,
+        intendedFieldOfStudy: profile?.intended_field_of_study as string | null,
+        researchInterests: profile?.research_interests as string[] | undefined,
+        skillTags: profile?.skill_tags as string[] | undefined,
+        currentJourneyStage: profile?.current_journey_stage as string | null,
       }
     : null;
 
