@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { ArrowRight, Compass, Rocket, Users, Lightbulb } from 'lucide-react';
+import { ArrowRight, Compass, FlaskConical, Handshake, BrainCircuit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -120,9 +120,9 @@ const FloatingDashboard = () => {
   const handleMouseLeave = () => { mouseX.set(0); mouseY.set(0); };
 
   const features = [
-    { icon: Rocket, label: 'Pipeline Tracker', desc: '7-stage journey', color: 'from-primary to-secondary' },
-    { icon: Users, label: 'Collaboration', desc: 'Find your team', color: 'from-secondary to-accent' },
-    { icon: Lightbulb, label: 'AI Insights', desc: 'Smart suggestions', color: 'from-accent to-primary' },
+    { icon: FlaskConical, label: 'Pipeline Tracker', desc: '7-stage journey', color: 'from-primary to-secondary' },
+    { icon: Handshake, label: 'Collaboration', desc: 'Find your team', color: 'from-secondary to-accent' },
+    { icon: BrainCircuit, label: 'AI Insights', desc: 'Smart suggestions', color: 'from-accent to-primary' },
   ];
 
   return (
@@ -166,16 +166,21 @@ const FloatingDashboard = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.7 + i * 0.15 }}
-                className="flex items-center gap-3 p-3 rounded-xl glass border border-border/30 hover:border-primary/30 transition-colors"
+                whileHover={{ x: 6, scale: 1.02 }}
+                className="flex items-center gap-3 p-3 rounded-xl glass border border-border/30 hover:border-primary/30 transition-colors cursor-pointer group"
               >
-                <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${f.color} flex items-center justify-center flex-shrink-0`}>
+                <motion.div
+                  className={`w-9 h-9 rounded-lg bg-gradient-to-br ${f.color} flex items-center justify-center flex-shrink-0`}
+                  whileHover={{ rotate: 12 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
                   <f.icon className="w-4 h-4 text-primary-foreground" />
-                </div>
+                </motion.div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium text-foreground">{f.label}</div>
                   <div className="text-xs text-muted-foreground">{f.desc}</div>
                 </div>
-                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground" />
+                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
               </motion.div>
             ))}
           </div>

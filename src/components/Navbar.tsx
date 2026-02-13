@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 
 const navItems = [
+  { label: 'Home', href: '/' },
   { label: 'Research', href: '/research' },
   { label: 'Community', href: '/community-hub' },
   { label: 'Opportunities', href: '/opportunities' },

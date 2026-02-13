@@ -57,13 +57,14 @@ const BrandRevealOverlayComponent = ({ onComplete }: BrandRevealOverlayProps) =>
 
             {/* Logo text — clean, no heavy glow */}
             <motion.h1
-              className="text-5xl md:text-7xl font-bold tracking-[0.25em] text-foreground/90 select-none"
+              className="text-5xl md:text-7xl font-bold tracking-[0.25em] select-none"
               style={{
                 textShadow: '0 0 40px hsla(191, 80%, 65%, 0.15)',
                 letterSpacing: '0.25em',
               }}
             >
-              SOCHX
+              <span className="text-foreground/90">SOCH</span>
+              <span className="text-primary" style={{ textShadow: '0 0 30px hsla(191, 100%, 62%, 0.4)' }}>X</span>
             </motion.h1>
 
             {/* Tagline */}
