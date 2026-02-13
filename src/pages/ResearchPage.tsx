@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
-import { StarField } from '@/components/StarField';
+import SubpageBackground from '@/components/SubpageBackground';
 import { BookOpen, FileText, TrendingUp, Search, ArrowRight, Layers, Microscope, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +30,7 @@ const ResearchPage = () => {
 
   return (
     <div className="relative min-h-screen bg-background overflow-x-hidden">
-      <StarField />
+      <SubpageBackground />
       <Navbar />
 
       <main className="relative z-10 pt-28 pb-20">
